@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "478962806406",
+    "firebase_url": "https://news-project-fcda6.firebaseio.com",
+    "project_id": "news-project-fcda6",
+    "storage_bucket": "news-project-fcda6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478962806406:android:9cf0ccf96c61b9fb",
+        "android_client_info": {
+          "package_name": "com.pl.dell.news"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "478962806406-r5baj9ne94j699kvj08trpdan53eumjd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5Q-8bA6Hrj51sOZ7jvq70CbYY_K2L-3Q"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

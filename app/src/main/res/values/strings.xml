@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">news</string>
+
+    <string-array name="source_list">
+        <item>techcrunch</item>
+        <item>google-news</item>
+        <item>ign</item>
+        <item>recode</item>
+        <item>time</item>
+        <item>espn</item>
+        <item>independent</item>
+
+    </string-array>
+
+    <string-array name="type_list">
+
+        <item>top</item>
+        <item>latest</item>
+        <item>popular</item>
+    </string-array>
+
+    <string-array name="send_to">
+        <item>whatsapp</item>
+        <item>facebook</item>
+
+    </string-array>
+    <string name="title_activity_login">Login</string>
+    <string name="facebook_app_id">1881895972072627</string>
+    <string name="fb_login_protocol_scheme">fb1881895972072627</string>
+
+    <string name="firebase_status_fmt">Firebase User: %s</string>
+    <string name="label_facebook_login">Firebase + Facebook Login</string>
+    <string name="desc_facebook_login">Use a Facebook Login credential to authenticate with Firebase.</string>
+    <string name="sign_in">Sign In</string>
+    <string name="signed_out">Signed Out</string>
+    <string name="facebook_status_fmt">Facebook User: %s</string>
+    <string name="desc_firebase_lockup">Firebase logo and name</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+    <string name="action_settings">Settings</string>
+</resources>
