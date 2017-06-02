@@ -7,7 +7,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by DELL on 30-05-2017.
@@ -45,12 +55,14 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_ID, newsSource.getId());
-        values.put(KEY_name, newsSource.getSourceName());
-        db.insert(TABLE_NAME, null, values);
+                ContentValues values = new ContentValues();
+                values.put(KEY_ID, newsSource.getId());
+                values.put(KEY_name, newsSource.getSourceName());
+                db.insert(TABLE_NAME, null, values);
 
-        Log.d("DBHelper", "Insert Messages Query Executed");
+                Log.d("DBHelper", "Insert Messages Query Executed");
+
+
     }
 
     public ArrayList<String> readAllSources(){
@@ -83,6 +95,7 @@ public class DbHelper extends SQLiteOpenHelper {
         return temp;
 
     }
+
 
 
 

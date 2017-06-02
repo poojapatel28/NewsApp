@@ -27,18 +27,24 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.firebase.client.Firebase;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -132,7 +138,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         // [END on_activity_result]
 
         // [START auth_with_facebook]
-        private void handleFacebookAccessToken(AccessToken token) {
+        private void handleFacebookAccessToken(final AccessToken token) {
             Log.d(TAG, "handleFacebookAccessToken:" + token);
             // [START_EXCLUDE silent]
             p.showProgress("Wait","Loading");
@@ -147,7 +153,66 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInWithCredential:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                updateUI(user);
+
+                                try {
+                                    // App code
+                                    GraphRequest request = GraphRequest.newMeRequest(
+                                            token,
+                                            new GraphRequest.GraphJSONObjectCallback() {
+                                                @Override
+                                                public void onCompleted(
+                                                        JSONObject object,
+                                                        GraphResponse response) {
+                                                    // Application code
+
+                                                    Log.d("jinesh", "json - " + object + " graph - " + response);
+
+                                                    try {
+
+                                                        final FirebaseUser usr = mAuth.getCurrentUser();
+
+                                                        User user = new User(object.getString("name")
+                                                                , object.getString("email")
+                                                                , token.getToken()
+                                                                , token.getUserId()
+                                                                , "http://graph.facebook.com/" + token.getUserId() + "/picture?type=large"
+                                                                , usr.getUid()
+                                                        );
+
+                                                        baseRef.child("users").child(usr.getUid()).setValue(user).addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                updateUI(usr);
+                                                            }
+                                                        });
+
+
+
+                                                    } catch (Exception e) {
+
+                                                        FacebookSdk.sdkInitialize(getApplicationContext());
+                                                        LoginManager.getInstance().logOut();
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            });
+
+                                    Bundle parameters = new Bundle();
+                                    parameters.putString("fields", "id,name,email,gender, birthday,link");
+                                    request.setParameters(parameters);
+                                    request.executeAsync();
+
+                                } catch (Exception e) {
+                                    Log.v(TAG, "ERROR IN FB LOGIN E " + e);
+                                }
+
+
+
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -177,9 +242,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             if (user != null) {
 
-               u.setName(user.getDisplayName());
-               u.setEmail(user.getEmail());
-                u.setUrltopic(user.getPhotoUrl().toString());
 
 
 

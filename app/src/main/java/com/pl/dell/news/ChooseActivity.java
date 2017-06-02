@@ -31,9 +31,8 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
     ArrayList<NewsSource> list;
     DatabaseReference myRef;
     DbHelper dbHelper;
-    boolean[] check;
-    int count = 0;
-    boolean click = false;
+    static int flag=0;
+
     ArrayList<NewsSource> news = new ArrayList<>();
     ArrayList<String> selectedItems = new ArrayList<String>();
 
@@ -46,25 +45,33 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
         myRef = database.getReference();
 
 
-
         button = (Button) findViewById(R.id.submit);
         listView = (ListView) findViewById(R.id.sources);
-        fetchSource();
+
         list = new ArrayList<>();
         dbHelper = new DbHelper(this);
-
-        check = new boolean[selectedItems.size()];
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, dbHelper.readAllSources());
+
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+
+        if(dbHelper.readAllSources().size()==0)
+        {fetchSource();
+        adapter.notifyDataSetChanged();}
+
         listView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-        check = new boolean[selectedItems.size()];
+
+
+
+
 
 
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                selectedItems.clear();
                 checkSelected();
+
 
                 if (selectedItems.size() <= 0) {
                     new AlertDialog.Builder(
@@ -118,6 +125,9 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
     }
 
       public void fetchSource() {
+            showProgress("Wait Loading","Loading List");
+          adapter.notifyDataSetChanged();
+
         Log.d("MainActivity", "fetch method");
         String url = "https://newsapi.org/v1/sources?category=&language=en&country=";
 
@@ -152,13 +162,16 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
                             String id = currentRow.optString("id");
                             item.setId(id);
 
-                            news.add(item);
+                           // news.add(item);
 
                             dbHelper.insertSources(item);
+
                         }
+                        adapter.notifyDataSetChanged();
+
                         Log.d("pooja", "data decoded");
 
-
+                        listView.setAdapter(adapter);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -182,8 +195,8 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
                 return params;
             }
         };
+          hideProgress();
         AppController.getInstance().addToRequestQueue(stringRequest, "req_fetch");
-
     }
 
 
@@ -204,6 +217,7 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
             }
         }
+
 
 
     }

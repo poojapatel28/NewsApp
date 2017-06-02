@@ -33,6 +33,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.pl.dell.news.network.NetworkHelper;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -163,7 +164,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
 
         onResume();
-        fetchSource();
+       // fetchSource();
         fetchMethod();
 
 
@@ -257,15 +258,19 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         Log.d("MainActivity", "URL " + url);
 
         try {
-
-            OkHttpClient client = new OkHttpClient();
-
-            okhttp3.Request request = new okhttp3.Request.Builder()
-                    .url(url)
-                    .build();
-
-            okhttp3.Response response = client.newCall(request).execute();
-            decodeNews(response.body().string());
+            networkHelper.nGet(url, new NetworkHelper.OnComplete() {
+                @Override
+                public void onSuccess(String res, Boolean succ) {
+                    try {
+                        if(succ)
+                        decodeNews(res);
+                        hideProgress();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        hideProgress();
+                    }
+                }
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -304,17 +309,21 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
                 String url = currentRow.optString("url");
                 item.setUrl(url);
                 String publishedAt = currentRow.optString("publishedAt");
-                String token[] = publishedAt.replace("Z", " ").replace("T", " ").split(" ");
-                item.setDate(token[0]);
-                item.setTime(token[1]);
-                Log.d("main acti", token[1]);
+                String token[] = publishedAt.replace("T", " ").replace("Z", " ").replace("+"," ").split(" ");
+                if(token.length==1)
+                {item.setDate(token[0]);}
+                else
+                {item.setDate(token[0]);
+                item.setTime(token[1]);}
+              //  Log.d("main",token[1]);
+               // Log.d("main acti", token[1]);
                 String des = currentRow.optString("description");
                 item.setDescription(des);
 
                 arrayList.add(item);
 
 
-                //   Toast.makeText(getApplicationContext(), " " + author , Toast.LENGTH_SHORT).show();
+                  // Toast.makeText(getApplicationContext(), " " + author , Toast.LENGTH_SHORT).show();
             }
 
 
@@ -362,12 +371,8 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         if (actionBarDrawerToggle.onOptionsItemSelected(item))
             return true;
 
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.string.action_settings) {
             return true;
         }
