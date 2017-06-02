@@ -1,5 +1,7 @@
 package com.pl.dell.news;
 
+import java.util.ArrayList;
+
 /**
  * Created by Jinesh Soni on 30/07/2016.
  */
@@ -11,19 +13,25 @@ public class User implements java.io.Serializable {
 	private String mPic;
 	private String mUid;
 
+
+
+    private ArrayList<String> pref;
+
 	public User() {
 	}
 
-	public User(String mName, String mEmail, String mToken, String mFbID, String mPic, String mUid) {
-		this.mName = mName;
-		this.mEmail = mEmail;
-		this.mToken = mToken;
-		this.mFbID = mFbID;
-		this.mPic = mPic;
-		this.mUid = mUid;
-	}
 
-	public String getmUid() {
+    public User(String mName, String mEmail, String mToken, String mFbID, String mPic, String mUid) {
+        this.mName = mName;
+        this.mEmail = mEmail;
+        this.mToken = mToken;
+        this.mFbID = mFbID;
+        this.mPic = mPic;
+        this.mUid = mUid;
+
+    }
+
+    public String getmUid() {
 		return mUid;
 	}
 

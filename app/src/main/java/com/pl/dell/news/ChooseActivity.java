@@ -2,20 +2,27 @@ package com.pl.dell.news;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,10 +38,12 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
     ArrayList<NewsSource> list;
     DatabaseReference myRef;
     DbHelper dbHelper;
-    static int flag=0;
 
+    FirebaseAuth mAuth;
+    FirebaseUser usr;
     ArrayList<NewsSource> news = new ArrayList<>();
     ArrayList<String> selectedItems = new ArrayList<String>();
+    ArrayList<String> result = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +51,9 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
         setContentView(R.layout.activity_choose);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         myRef = database.getReference();
+        usr = mAuth.getCurrentUser();
 
 
         button = (Button) findViewById(R.id.submit);
@@ -54,79 +65,38 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-
-        if(dbHelper.readAllSources().size()==0)
-        {fetchSource();
-        adapter.notifyDataSetChanged();}
+        if (!getIntent().hasExtra("main"))
+            getData();
+        else
+            freshCall();
 
         listView.setAdapter(adapter);
 
 
+        button.setOnClickListener(new View.OnClickListener()
+
+                                  {
+                                      public void onClick(View v) {
+                                          selectedItems.clear();
+                                          checkSelected();
 
 
+                                          Intent intent = new Intent(getApplicationContext(),
+                                                  MainActivity.class);
+
+                                          startActivity(intent);
 
 
+                                      }
+                                  }
 
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                selectedItems.clear();
-                checkSelected();
-
-
-                if (selectedItems.size() <= 0) {
-                    new AlertDialog.Builder(
-                            ChooseActivity.this)
-
-                            // Setting Dialog Title
-                            .setTitle("Alert Dialog")
-
-                            // Setting Dialog Message
-                            .setMessage("Please select")
-
-                            // Setting Icon to Dialog
-                            // alertDialog.setIcon(R.drawable.tick);
-                            .setPositiveButton("ok", null)
-                            .show();
-
-                } else {
-                    String[] outputStrArr = new String[selectedItems.size()];
-
-                    for (int k = 0; k < selectedItems.size(); k++) {
-                        for (int j = 0; j < selectedItems.size(); j++) {
-                            outputStrArr[j] = selectedItems.get(k);
-                        }
-                    }
-                    int j = 0;
-                    int k = 0;
-                    int size = selectedItems.size();
-                    while (size > 0) {
-                        outputStrArr[j] = selectedItems.get(k);
-                        j++;
-                        k++;
-                        size--;
-                    }
-
-                    Intent intent = new Intent(getApplicationContext(),
-                            MainActivity.class);
-
-                    Bundle b = new Bundle();
-                    b.putStringArray("selectedItems", outputStrArr);
-                    intent.putExtras(b);
-                    startActivity(intent);
-
-
-                }
-            }
-        });
-
-
-
+        );
 
     }
 
-      public void fetchSource() {
-            showProgress("Wait Loading","Loading List");
-          adapter.notifyDataSetChanged();
+    public void fetchSource() {
+        showProgress("Wait Loading", "Loading List");
+        adapter.notifyDataSetChanged();
 
         Log.d("MainActivity", "fetch method");
         String url = "https://newsapi.org/v1/sources?category=&language=en&country=";
@@ -162,7 +132,7 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
                             String id = currentRow.optString("id");
                             item.setId(id);
 
-                           // news.add(item);
+                            // news.add(item);
 
                             dbHelper.insertSources(item);
 
@@ -195,36 +165,83 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
                 return params;
             }
         };
-          hideProgress();
+        hideProgress();
         AppController.getInstance().addToRequestQueue(stringRequest, "req_fetch");
     }
 
-
-
     public void checkSelected() {
+
         SparseBooleanArray checked = listView.getCheckedItemPositions();
         selectedItems.clear();
 
+        if (checked.size() == 0) {
+            Toast.makeText(getApplicationContext(), "No Change", Toast.LENGTH_SHORT).show();
+        } else {
+            for (int i = 0; i < checked.size(); i++) {
+                int pos = checked.keyAt(i);
 
-        for (int i = 0; i < checked.size(); i++)
+                if (checked.valueAt(i)) {
+                    selectedItems.add(adapter.getItem(pos));
+                }
 
-        {
-            int pos = checked.keyAt(i);
+                UserPrefrence usrpref = new UserPrefrence(usr.getUid(), selectedItems);
+                baseRef.child("user_pref").child(usr.getUid()).setValue(usrpref).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                    }
 
-            if (checked.valueAt(i)) {
 
-                selectedItems.add(adapter.getItem(pos));
-
+                });
             }
         }
-
-
-
     }
 
     @Override
     public void onClick(View v) {
 
+    }
+
+    public ArrayList<String> getData() {
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                ArrayList<String> post = (ArrayList<String>) dataSnapshot.getValue();
+
+                if (post != null) {
+                    if (post.size() > 0) {
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        finish();
+                    } else freshCall();
+                } else freshCall();
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.d("loadPost:onCancelled", databaseError.toException().toString());
+                // ...
+            }
+        };
+        baseRef.child("user_pref")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("mpref")
+                .addValueEventListener(postListener);
+
+
+        return result;
+
+    }
+
+    void freshCall() {
+        if (dbHelper.readAllSources().size() == 0) {
+            fetchSource();
+            adapter.notifyDataSetChanged();
+        }
     }
 }
 

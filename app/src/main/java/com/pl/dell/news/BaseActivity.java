@@ -28,6 +28,8 @@ public class BaseActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         progressDialog=new ProgressDialog(this);
         networkHelper = new NetworkHelper(this);
     }

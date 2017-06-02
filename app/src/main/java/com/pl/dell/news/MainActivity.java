@@ -30,9 +30,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.pl.dell.news.network.NetworkHelper;
 import com.squareup.picasso.Picasso;
 
@@ -58,7 +62,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
     ImageView pic;
     NavigationView navigationView;
     TextView all;
-    String[] selectedSource;
+   // String[] selectedSource;
 
     ActionBarDrawerToggle actionBarDrawerToggle;
     DrawerLayout drawerLayout;
@@ -79,6 +83,8 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
     ListView s_list;
     private FirebaseAuth mAuth;
+
+    ArrayList<String> nList = new ArrayList<>();
     User u;
 
     @Override
@@ -87,6 +93,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         setContentView(R.layout.activity_main);
         t = new Toolbar(this);
         t.setTitle("News");
+        FacebookSdk.sdkInitialize(getApplicationContext());
 
         type = "top";
         mAuth = FirebaseAuth.getInstance();
@@ -130,10 +137,10 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
         pic = (ImageView) findViewById(R.id.imageView);
         Picasso.with(getApplicationContext()).load(currentUser.getPhotoUrl()).into(pic);
-        Bundle b = getIntent().getExtras();
-        selectedSource = b.getStringArray("selectedItems");
+       // Bundle b = getIntent().getExtras();
+        //selectedSource = b.getStringArray("selectedItems");
 
-        source = selectedSource[0];
+       // source = selectedSource[0];
 
 
         progressDialog = new ProgressDialog(this);
@@ -154,14 +161,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         dbHelper = new DbHelper(getApplicationContext());
         s_list = (ListView) findViewById(R.id.s_list);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, selectedSource);
-
-        adapter.notifyDataSetChanged();
-
-        s_list.setAdapter(adapter);
-        s_list.setOnItemClickListener(new DrawerItemClickListener());
-
-
+        getData();
 
         onResume();
        // fetchSource();
@@ -206,7 +206,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             @Override
             public void onClick(View v) {
                 drawerLayout.closeDrawers();
-                startActivity(new Intent(MainActivity.this, ChooseActivity.class));
+                startActivity(new Intent(MainActivity.this, ChooseActivity.class).putExtra("main","main"));
 
             }
         });
@@ -215,8 +215,8 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             @Override
             public void onClick(View v) {
                 drawerLayout.closeDrawers();
-                for (int i = 0; i < selectedSource.length; i++) {
-                    source = selectedSource[i];
+                for (int i = 0; i < nList.size(); i++) {
+                    source = nList.get(i);
                     fetchMethod();
                 }
             }
@@ -474,9 +474,47 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
     private void selectItem(int position) {
 
 
-        source = selectedSource[position];
+        source = nList.get(position);
         fetchMethod();
         drawerLayout.closeDrawers();
+
+    }
+
+    public void getData() {
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                nList = (ArrayList<String>) dataSnapshot.getValue();
+
+                if(nList!=null ) {
+                    if(nList.size()>0) {
+                        ArrayAdapter<String> adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, nList);
+                        s_list.setAdapter(adapter);
+                        s_list.setOnItemClickListener(new DrawerItemClickListener());
+
+                        source = nList.get(0);
+                        fetchMethod();
+                    };
+                };
+
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.d("loadPost:onCancelled", databaseError.toException().toString());
+                // ...
+            }
+        };
+        baseRef.child("user_pref")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("mpref")
+                .addValueEventListener(postListener);
+
+
+
 
     }
 
