@@ -71,7 +71,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsModelHolde
         });
 
 
-        hello
+       // hello
 
 
 
