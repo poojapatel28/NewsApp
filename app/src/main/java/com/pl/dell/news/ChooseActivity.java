@@ -8,7 +8,6 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -37,6 +36,7 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
     ListView listView;
     ArrayAdapter<String> adapter;
     ArrayList<NewsSource> list;
+    ArrayList<String> data;
     DatabaseReference myRef;
     DbHelper dbHelper;
 
@@ -60,28 +60,29 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
         button = (FloatingActionButton) findViewById(R.id.submit);
         listView = (ListView) findViewById(R.id.sources);
 
-        list = new ArrayList<>();
+
         dbHelper = new DbHelper(this);
+        list = new ArrayList<>();
+        data = dbHelper.readAllSources();
 
 
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice,dbHelper.readAllSources());
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, data);
 
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-       // Toast.makeText(getApplicationContext(),getData().get(0),Toast.LENGTH_SHORT);
+        // Toast.makeText(getApplicationContext(),getData().get(0),Toast.LENGTH_SHORT);
         if (!getIntent().hasExtra("main")) {
 
-             showProgress("Please Wait", "Loading");
-            getData();}
-
-else{
+            showProgress("Please Wait", "Loading");
+            getData();
+        } else {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    //showProgress("Please Wait","Loading List");
                     freshCall();
                 }
             });
-    }
-
+        }
 
 
         listView.setAdapter(adapter);
@@ -110,7 +111,7 @@ else{
 
     public void fetchSource() {
         showProgress("Wait Loading", "Loading List");
-        adapter.notifyDataSetChanged();
+        // adapter.notifyDataSetChanged();
 
         Log.d("MainActivity", "fetch method");
         String url = "https://newsapi.org/v1/sources?category=&language=en&country=";
@@ -146,18 +147,33 @@ else{
                             String id = currentRow.optString("id");
                             item.setId(id);
 
-                             news.add(item.getId());
 
-                            dbHelper.insertSources(item);
+                            if (item.getId().equals("the-next-web")) {
+
+                            } else { news.add(item.getId());
+                                dbHelper.insertSources(item);
+                            }
 
                         }
 
-                        adapter.notifyDataSetChanged();
-                        hideProgress();
+                       runOnUiThread(new Runnable() {
+                           @Override
+                           public void run() {
+                               data = dbHelper.readAllSources();
+                               //adapter.notifyDataSetChanged();
+                               adapter = new ArrayAdapter<String>(ChooseActivity.this,
+                                       android.R.layout.simple_list_item_multiple_choice, data);
+                               listView.setAdapter(adapter);
+                               hideProgress();
+
+
+                           }
+                       });
+
 
                         Log.d("pooja", "data decoded");
 
-                        listView.setAdapter(adapter);
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -233,8 +249,14 @@ else{
                         //hideProgress();
                         finish();
                         hideProgress();
-                    } else {hideProgress();freshCall();}
-                } else {hideProgress();freshCall();}
+                    } else {
+                        hideProgress();
+                        freshCall();
+                    }
+                } else {
+                    hideProgress();
+                    freshCall();
+                }
 
 
             }
@@ -260,11 +282,12 @@ else{
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    showProgress("Please Wait","Loading List");
                     fetchSource();
                 }
             });
 
-            adapter.notifyDataSetChanged();
+            //adapter.notifyDataSetChanged();
         }
     }
 }

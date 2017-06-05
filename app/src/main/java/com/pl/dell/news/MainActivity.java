@@ -278,18 +278,21 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
                             decodeNews(res);
                         hideProgress();
                     } catch (JSONException e) {
-
+                        Log.e("no content","main Activity");
+                        Toast.makeText(getApplicationContext(), "No Content for this Source in Top category", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                         hideProgress();
-                        Toast.makeText(getApplicationContext(), "No Content for this Source in Top category", Toast.LENGTH_SHORT).show();
+
                     }
                 }
             });
 
         } catch (Exception e) {
             e.printStackTrace();
-            hideProgress();
+            Log.e("no content","main Activity");
             Toast.makeText(getApplicationContext(), "No Content for this Source in Top category", Toast.LENGTH_SHORT).show();
+            hideProgress();
+
         }
         //hideProgress();
     }
@@ -355,6 +358,13 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             Log.d("pooja", "data decoded");
 
         }
+        else if(status.equals("error"))
+        { Log.e("no content","main Activity");
+            Toast.makeText(getApplicationContext(), "No Content for this Source in Top category", Toast.LENGTH_SHORT).show();
+            hideProgress();
+
+        }
+
 
         hideProgress();
 

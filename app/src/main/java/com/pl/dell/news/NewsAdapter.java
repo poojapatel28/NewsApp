@@ -49,7 +49,12 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsModelHolde
 
         View view=holder.itemView;
         holder.tvAuthor.setText(newsModelArrayList.get(position).getA_name());
-        holder.tvDescription.setText(newsModelArrayList.get(position).getDescription());
+        if(newsModelArrayList.get(position).getDescription().equals("des"))
+        {
+            holder.tvDescription.setText("  ");
+        }
+        else
+        {holder.tvDescription.setText(newsModelArrayList.get(position).getDescription());}
         holder.tvTitle.setText(newsModelArrayList.get(position).getTitle());
        // holder.tvImage.setText(newsModelArrayList.get(position).getImage());
 

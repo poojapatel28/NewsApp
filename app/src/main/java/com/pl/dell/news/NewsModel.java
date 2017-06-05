@@ -75,8 +75,14 @@ public class NewsModel {
     }
 
     public void setDescription(String description) {
+       if(description.equals("null"))
+       {
+           this.description="des";
+       }
+        else
+       {
         this.description = description;
-    }
+    }}
 
     public String getA_name() {
         return a_name;

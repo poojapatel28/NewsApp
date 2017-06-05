@@ -1,6 +1,7 @@
 package com.pl.dell.news.network;
 
 import android.app.Activity;
+import android.widget.Toast;
 
 
 import java.io.IOException;
@@ -46,6 +47,7 @@ public class NetworkHelper {
                 }
                     catch(Exception e){
                         e.printStackTrace();
+                        Toast.makeText(activity,"no content for this source type",Toast.LENGTH_SHORT).show();
                         complete.onSuccess("", false);
                     }
                 }

@@ -262,6 +262,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                runOnUiThread(new Runnable() {
                    @Override
                    public void run() {
+                       p.hideProgress();
                        startActivity(new Intent(getApplicationContext(),ChooseActivity.class));
                        finish();
                    }
