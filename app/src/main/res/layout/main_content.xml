@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:text="News"
-            android:textStyle="bold"
+            android:textStyle="normal"
             android:textColor="#ffffff"
             android:layout_marginLeft="30dp"
             />

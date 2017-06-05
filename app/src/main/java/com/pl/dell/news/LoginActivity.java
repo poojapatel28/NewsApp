@@ -145,7 +145,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         private void handleFacebookAccessToken(final AccessToken token) {
             Log.d(TAG, "handleFacebookAccessToken:" + token);
             // [START_EXCLUDE silent]
-            p.showProgress("Wait","Loading");
+            p.showProgress("Please Wait","Loading");
             // [END_EXCLUDE]
 
             AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());

@@ -19,9 +19,9 @@
         android:layout_width="100dp"
 
         android:layout_height="wrap_content"
-        android:textSize="25sp"
+        android:textSize="23sp"
         android:text="Settings"
-        android:textStyle="bold"
+        android:textStyle="normal"
         android:textColor="#ffffff"
         android:layout_marginLeft="5dp"
         />

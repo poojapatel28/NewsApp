@@ -257,7 +257,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             @Override
             public void run() {
                 if (!isFinishing())
-                    showProgress("please wait", "loading");
+                    showProgress("Please wait", "Fetching News");
 
 
             }
@@ -278,8 +278,10 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
                             decodeNews(res);
                         hideProgress();
                     } catch (JSONException e) {
+
                         e.printStackTrace();
                         hideProgress();
+                        Toast.makeText(getApplicationContext(), "No Content for this Source in Top category", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -287,6 +289,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         } catch (Exception e) {
             e.printStackTrace();
             hideProgress();
+            Toast.makeText(getApplicationContext(), "No Content for this Source in Top category", Toast.LENGTH_SHORT).show();
         }
         //hideProgress();
     }
@@ -458,7 +461,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
 
                         Log.d("MainActivity.this", "errrrorrr");
-                        Toast.makeText(getApplicationContext(), "No Content for this Source in Top category", Toast.LENGTH_SHORT).show();
+
                         Log.d("Adapter", "err");
                     }
 

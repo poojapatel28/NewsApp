@@ -70,7 +70,7 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
        // Toast.makeText(getApplicationContext(),getData().get(0),Toast.LENGTH_SHORT);
         if (!getIntent().hasExtra("main")) {
 
-             showProgress("WAit", "Loading data");
+             showProgress("Please Wait", "Loading");
             getData();}
 
 else{
@@ -233,8 +233,8 @@ else{
                         //hideProgress();
                         finish();
                         hideProgress();
-                    } else {freshCall();hideProgress();}
-                } else {freshCall();hideProgress();}
+                    } else {hideProgress();freshCall();}
+                } else {hideProgress();freshCall();}
 
 
             }
