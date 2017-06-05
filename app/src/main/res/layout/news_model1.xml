@@ -66,6 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
                     android:layout_gravity="bottom"
+                    android:layout_marginBottom="0dp"
                     android:textSize="12sp"
                     android:id="@+id/author"/>
 
@@ -77,11 +78,12 @@
                     android:textSize="10sp"
                     android:layout_gravity="bottom|left"
                     android:layout_weight="5"
+                    android:layout_marginBottom="0dp"
                     />
 
                <ImageView
                    android:layout_width="30dp"
-
+                    android:layout_marginBottom="0dp"
                    android:layout_height="30dp"
                    android:src="@mipmap/ic_launcher"
                    android:id="@+id/button"/>

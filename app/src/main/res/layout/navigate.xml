@@ -29,7 +29,7 @@
 
 
     <ListView
-        android:layout_weight="55"
+        android:layout_weight="53"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:id="@+id/s_list"
@@ -50,7 +50,7 @@
         android:id="@+id/setting"
         android:gravity="center|left"
         android:layout_weight="7"
-        android:drawableLeft="@android:drawable/ic_secure"
+        android:drawableLeft="@drawable/settings"
 
         android:text="Settings"
         android:layout_width="match_parent"
@@ -67,13 +67,13 @@
 
     <TextView
         android:drawablePadding="5dp"
-        android:drawableLeft="@android:drawable/radiobutton_on_background"
+        android:drawableLeft="@drawable/logoutsymbol"
         android:textColor="#000"
         android:textSize="16sp"
         android:padding="10dp"
         android:id="@+id/log"
         android:gravity="center|left"
-        android:layout_weight="7"
+        android:layout_weight="8"
         android:text="Logout"
         android:layout_width="match_parent"
         android:layout_height="0dp" />

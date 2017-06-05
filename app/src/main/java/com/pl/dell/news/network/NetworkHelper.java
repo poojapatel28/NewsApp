@@ -2,6 +2,7 @@ package com.pl.dell.news.network;
 
 import android.app.Activity;
 
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -29,26 +30,25 @@ public class NetworkHelper {
             public void onFailure(Call call, IOException e) {
                 complete.onSuccess("",false);
             }
+            String r;
 
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
+                r=response.body().string();
                 try {
+
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                complete.onSuccess(response.body().string(),response.code()==200);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                complete.onSuccess("",false);
-                            }
+                            complete.onSuccess(r, response.code() == 200);
                         }
                     });
-                }catch (Exception e){
-                    e.printStackTrace();
-                    complete.onSuccess("",false);
                 }
-            }
+                    catch(Exception e){
+                        e.printStackTrace();
+                        complete.onSuccess("", false);
+                    }
+                }
         });
 
     }

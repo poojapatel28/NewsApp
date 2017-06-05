@@ -57,15 +57,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     DemoProgress p;
     Activity a;
-
+    String u_name;
     User u;
         private static final String TAG = "FacebookLogin";
-
+        TextView name;
         private TextView mStatusTextView;
 
         // [START declare_auth]
         private FirebaseAuth mAuth;
         // [END declare_auth]
+
 
         private CallbackManager mCallbackManager;
 
@@ -76,10 +77,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             setContentView(R.layout.activity_login);
             p=new DemoProgress(LoginActivity.this);
 
+
             // Views
             mStatusTextView = (TextView) findViewById(R.id.status);
+            name=(TextView)findViewById(R.id.name);
 
-            findViewById(R.id.button_facebook_signout).setOnClickListener(this);
+
+         //   findViewById(R.id.button_facebook_signout).setOnClickListener(this);
             u= new User();
 
             // [START initialize_auth]
@@ -153,6 +157,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInWithCredential:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
+                                u_name=user.getDisplayName();
 
                                 try {
                                     // App code
@@ -246,10 +251,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
 
 
-                mStatusTextView.setText(getString(R.string.facebook_status_fmt, user.getDisplayName()));
+               // mStatusTextView.setText(getString(R.string.facebook_status_fmt, user.getDisplayName()));
+                mStatusTextView.setVisibility(View.GONE);
+               // name.setVisibility(View.GONE);
 
                 findViewById(R.id.button_facebook_login).setVisibility(View.GONE);
-                findViewById(R.id.button_facebook_signout).setVisibility(View.VISIBLE);
+            //    findViewById(R.id.button_facebook_signout).setVisibility(View.GONE);
+               // name.setVisibility(View.GONE);
 
                runOnUiThread(new Runnable() {
                    @Override
@@ -259,20 +267,23 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                    }
                });
             } else {
-                mStatusTextView.setText(R.string.signed_out);
+                mStatusTextView.setText("THE NEWS STORE");
+
+
+
 
 
                 findViewById(R.id.button_facebook_login).setVisibility(View.VISIBLE);
-                findViewById(R.id.button_facebook_signout).setVisibility(View.GONE);
+               // findViewById(R.id.button_facebook_signout).setVisibility(View.GONE);
             }
         }
 
         @Override
         public void onClick(View v) {
             int i = v.getId();
-            if (i == R.id.button_facebook_signout) {
+         /*   if (i == R.id.button_facebook_signout) {
                 signOut();
-            }
+            }*/
         }
 
     public void onBackPressed() {

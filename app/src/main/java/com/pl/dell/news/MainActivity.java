@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -28,7 +30,6 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
@@ -44,12 +45,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import okhttp3.OkHttpClient;
 
 public class MainActivity extends BaseActivity implements ItemClickListener {
 
@@ -62,9 +60,9 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
     ImageView pic;
     NavigationView navigationView;
     TextView all;
-   // String[] selectedSource;
-
-    ActionBarDrawerToggle actionBarDrawerToggle;
+    // String[] selectedSource;
+    ImageView ham;
+    ActionBarDrawerToggle toggle;
     DrawerLayout drawerLayout;
 
     RecyclerView.LayoutManager mLayoutManager;
@@ -82,10 +80,9 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
 
     ListView s_list;
-    private FirebaseAuth mAuth;
-
     ArrayList<String> nList = new ArrayList<>();
     User u;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,11 +90,13 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         setContentView(R.layout.activity_main);
         t = new Toolbar(this);
         t.setTitle("News");
+        ham=(ImageView)findViewById(R.id.ham);
         FacebookSdk.sdkInitialize(getApplicationContext());
 
         type = "top";
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
+
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
 
@@ -113,10 +112,10 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         u = new User();
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        setSupportActionBar(t);
+       // setSupportActionBar(t);
 
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(
+        setToolbar();
+     /*  actionBarDrawerToggle = new ActionBarDrawerToggle(
                 this, drawerLayout, t,
                 R.string.open, R.string.close
         );
@@ -125,7 +124,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        actionBarDrawerToggle.syncState();
+        actionBarDrawerToggle.syncState();*/
 
 
         user = (TextView) findViewById(R.id.name);
@@ -137,10 +136,12 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
         pic = (ImageView) findViewById(R.id.imageView);
         Picasso.with(getApplicationContext()).load(currentUser.getPhotoUrl()).into(pic);
-       // Bundle b = getIntent().getExtras();
+        // Bundle b = getIntent().getExtras();
         //selectedSource = b.getStringArray("selectedItems");
 
-       // source = selectedSource[0];
+        // source = selectedSource[0];
+       // StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+       // StrictMode.setThreadPolicy(policy);
 
 
         progressDialog = new ProgressDialog(this);
@@ -164,11 +165,8 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         getData();
 
         onResume();
-       // fetchSource();
+        // fetchSource();
         fetchMethod();
-
-
-
 
 
         Log.d("pooja", "adapter set");
@@ -181,7 +179,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
 
                 new AlertDialog.Builder(MainActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setIcon(R.drawable.logoutsymbol)
                         .setTitle("LogOut")
                         .setMessage("Are you sure you want to Log Out?")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -206,7 +204,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             @Override
             public void onClick(View v) {
                 drawerLayout.closeDrawers();
-                startActivity(new Intent(MainActivity.this, ChooseActivity.class).putExtra("main","main"));
+                startActivity(new Intent(MainActivity.this, ChooseActivity.class).putExtra("main", "main"));
 
             }
         });
@@ -222,6 +220,12 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             }
         });
 
+        ham.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
 
     }
 
@@ -249,8 +253,16 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
         arrayList.clear();
         // adapter.notifyDataSetChanged();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing())
+                    showProgress("please wait", "loading");
 
-        showProgress("please wait", "loading");
+
+            }
+        });
+
 
         Log.d("MainActivity", "fetch method");
         String url = "https://newsapi.org/v1/articles?source=" + source + "&sortBy=" + type + "&apiKey=e0d3a70e42de4bb58495637f504e7fa4";
@@ -262,8 +274,8 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
                 @Override
                 public void onSuccess(String res, Boolean succ) {
                     try {
-                        if(succ)
-                        decodeNews(res);
+                        if (succ)
+                            decodeNews(res);
                         hideProgress();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -276,9 +288,8 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             e.printStackTrace();
             hideProgress();
         }
+        //hideProgress();
     }
-
-
 
 
     private void decodeNews(String response) throws JSONException {
@@ -309,21 +320,27 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
                 String url = currentRow.optString("url");
                 item.setUrl(url);
                 String publishedAt = currentRow.optString("publishedAt");
-                String token[] = publishedAt.replace("T", " ").replace("Z", " ").replace("+"," ").split(" ");
-                if(token.length==1)
-                {item.setDate(token[0]);}
-                else
-                {item.setDate(token[0]);
-                item.setTime(token[1]);}
-              //  Log.d("main",token[1]);
-               // Log.d("main acti", token[1]);
+                if(publishedAt.equals("null"))
+                {
+                    item.setDate("date1");
+                    item.setTime("time1");
+                }
+                String token[] = publishedAt.replace("T", " ").replace("Z", " ").replace("+", " ").split(" ");
+                if (token.length == 1) {
+                    item.setDate(token[0]);
+                } else {
+                    item.setDate(token[0]);
+                    item.setTime(token[1]);
+                }
+                //  Log.d("main",token[1]);
+                // Log.d("main acti", token[1]);
                 String des = currentRow.optString("description");
                 item.setDescription(des);
 
                 arrayList.add(item);
 
 
-                  // Toast.makeText(getApplicationContext(), " " + author , Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplicationContext(), " " + author , Toast.LENGTH_SHORT).show();
             }
 
 
@@ -343,8 +360,6 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
     }
 
 
-
-
     @Override
     public void onItemClick(View v, int pos) {
         NewsModel model = arrayList.get(pos);
@@ -353,9 +368,6 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
         startActivity(i);
 
     }
-
-
-
 
 
     @Override
@@ -368,7 +380,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (actionBarDrawerToggle.onOptionsItemSelected(item))
+        if (toggle.onOptionsItemSelected(item))
             return true;
 
         int id = item.getItemId();
@@ -384,13 +396,13 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        actionBarDrawerToggle.syncState();
+        toggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        actionBarDrawerToggle.onConfigurationChanged(newConfig);
+        toggle.onConfigurationChanged(newConfig);
     }
 
     public void fetchSource() {
@@ -446,6 +458,7 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
 
 
                         Log.d("MainActivity.this", "errrrorrr");
+                        Toast.makeText(getApplicationContext(), "No Content for this Source in Top category", Toast.LENGTH_SHORT).show();
                         Log.d("Adapter", "err");
                     }
 
@@ -458,16 +471,6 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             }
         };
         AppController.getInstance().addToRequestQueue(stringRequest, "req_fetch");
-
-    }
-
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
 
     }
 
@@ -488,19 +491,22 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
                 // Get Post object and use the values to update the UI
                 nList = (ArrayList<String>) dataSnapshot.getValue();
 
-                if(nList!=null ) {
-                    if(nList.size()>0) {
+                if (nList != null) {
+                    if (nList.size() > 0) {
                         ArrayAdapter<String> adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, nList);
                         s_list.setAdapter(adapter);
                         s_list.setOnItemClickListener(new DrawerItemClickListener());
 
                         source = nList.get(0);
                         fetchMethod();
-                    };
-                };
+                    }
+                    ;
+                }
+                ;
 
 
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Getting Post failed, log a message
@@ -514,10 +520,39 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
                 .addValueEventListener(postListener);
 
 
-
-
     }
 
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectItem(position);
+        }
+
+    }
+    void setToolbar() {
+        t.setTitleTextAppearance(this, android.R.style.TextAppearance_Widget_TextView);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, t,
+                R.string.open, R.string.close);
+
+        //Set the custom toolbar
+        if (t != null) {
+            setSupportActionBar(t);
+        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        drawerLayout.setDrawerListener(toggle);
+        t.setTitle("News");
+       // t.setNavigationIcon(R.drawable.logoutsymbol);
+        toggle.setDrawerIndicatorEnabled(true);
+        toggle.syncState();
+        t.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+    }
 
 }
 

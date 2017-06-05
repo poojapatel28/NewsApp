@@ -52,9 +52,16 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsModelHolde
         holder.tvDescription.setText(newsModelArrayList.get(position).getDescription());
         holder.tvTitle.setText(newsModelArrayList.get(position).getTitle());
        // holder.tvImage.setText(newsModelArrayList.get(position).getImage());
+
         Picasso.with(c).load(newsModelArrayList.get(position).getImage()).placeholder(R.drawable.loading).into(holder.tvImage);
         Picasso.with(c).load(R.drawable.iconshare).into(holder.tvButton);
-        holder.tvPublishedAt.setText(newsModelArrayList.get(position).getDate()+"  "+newsModelArrayList.get(position).getTime());
+       if(newsModelArrayList.get(position).getDate().equals("date1")||newsModelArrayList.get(position).getTime().equals("time1"))
+        {
+            holder.tvPublishedAt.setText(" ");
+        }
+        else
+        { holder.tvPublishedAt.setText(newsModelArrayList.get(position).getDate() + "  " + newsModelArrayList.get(position).getTime());}
+
 
 
         holder.tvButton.setOnClickListener(new View.OnClickListener() {

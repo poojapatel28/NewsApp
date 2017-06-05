@@ -3,6 +3,7 @@ package com.pl.dell.news;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -32,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChooseActivity extends BaseActivity implements View.OnClickListener {
-    Button button;
+    FloatingActionButton button;
     ListView listView;
     ArrayAdapter<String> adapter;
     ArrayList<NewsSource> list;
@@ -41,7 +42,7 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
     FirebaseAuth mAuth;
     FirebaseUser usr;
-    ArrayList<NewsSource> news = new ArrayList<>();
+    ArrayList<String> news = new ArrayList<>();
     ArrayList<String> selectedItems = new ArrayList<String>();
     ArrayList<String> result = new ArrayList<String>();
 
@@ -56,19 +57,32 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
         usr = mAuth.getCurrentUser();
 
 
-        button = (Button) findViewById(R.id.submit);
+        button = (FloatingActionButton) findViewById(R.id.submit);
         listView = (ListView) findViewById(R.id.sources);
 
         list = new ArrayList<>();
         dbHelper = new DbHelper(this);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, dbHelper.readAllSources());
+
+
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice,dbHelper.readAllSources());
 
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+       // Toast.makeText(getApplicationContext(),getData().get(0),Toast.LENGTH_SHORT);
+        if (!getIntent().hasExtra("main")) {
 
-        if (!getIntent().hasExtra("main"))
-            getData();
-        else
-            freshCall();
+             showProgress("WAit", "Loading data");
+            getData();}
+
+else{
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    freshCall();
+                }
+            });
+    }
+
+
 
         listView.setAdapter(adapter);
 
@@ -132,12 +146,14 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
                             String id = currentRow.optString("id");
                             item.setId(id);
 
-                            // news.add(item);
+                             news.add(item.getId());
 
                             dbHelper.insertSources(item);
 
                         }
+
                         adapter.notifyDataSetChanged();
+                        hideProgress();
 
                         Log.d("pooja", "data decoded");
 
@@ -212,19 +228,21 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
                 if (post != null) {
                     if (post.size() > 0) {
+
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        //hideProgress();
                         finish();
-                    } else freshCall();
-                } else freshCall();
+                        hideProgress();
+                    } else {freshCall();hideProgress();}
+                } else {freshCall();hideProgress();}
 
 
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
                 Log.d("loadPost:onCancelled", databaseError.toException().toString());
-                // ...
+
             }
         };
         baseRef.child("user_pref")
@@ -239,7 +257,13 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
     void freshCall() {
         if (dbHelper.readAllSources().size() == 0) {
-            fetchSource();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    fetchSource();
+                }
+            });
+
             adapter.notifyDataSetChanged();
         }
     }

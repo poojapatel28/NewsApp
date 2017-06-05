@@ -46,8 +46,12 @@ public class NewsModel {
     }
 
     public void setTime(String time) {
-        String ti = formattime(time);
-        this.time = ti;
+        if (time.equals("time1")) {
+            this.time = "time1";
+        } else {
+            String ti = formattime(time);
+            this.time = ti;
+        }
     }
 
     public String getUrl() {
@@ -91,8 +95,13 @@ public class NewsModel {
     }
 
     public void setDate(String date_time) {
+        if(date_time.equals("date1"))
+        {
+            this.date="date1";
+        }
+        else{
         String d = formatdate(date_time);
-        this.date = d;
+        this.date = d;}
     }
 
     public String getImage() {
@@ -117,7 +126,7 @@ public class NewsModel {
         String strCurrentDate = fdate;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date newDate = null;
-        if (fdate != null)
+        if (fdate != null) {
             if (!fdate.equals(""))
                 try {
                     newDate = format.parse(strCurrentDate);
@@ -128,10 +137,11 @@ public class NewsModel {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+        }
 
 
-        return date;
-    }
+            return date;
+        }
 
     public String formattime(String time) {
         String strCurrentDate = time;

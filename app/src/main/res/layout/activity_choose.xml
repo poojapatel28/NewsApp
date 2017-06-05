@@ -1,32 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
-    tools:context="com.pl.dell.news.ChooseActivity"
-    android:weightSum="50">
 
-    <ListView
+
+    <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/sources"
-        android:layout_weight="44"
-        ></ListView>
-    <Button
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="4"
-        android:layout_marginTop="5dp"
-        android:layout_gravity="center|bottom"
-        android:gravity="center"
         android:background="@color/colorPrimary"
+        android:layout_height="56dp"
+        android:id="@+id/tool">
+
+
+    <TextView
+        android:layout_width="100dp"
+
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="Settings"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
         android:layout_marginLeft="5dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="5dp"
+        />
+   </android.support.v7.widget.Toolbar>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_marginTop="55dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <ListView
+        android:layout_below="@+id/tool"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sources"
 
-        android:id="@+id/submit"
-        android:text="Submit"/>
+        >
 
+
+    </ListView>
 </LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_below="@+id/sources"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/checked"
+        />
+
+</android.support.design.widget.CoordinatorLayout>
