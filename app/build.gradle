@@ -11,85 +11,93 @@ android {
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
+        resConfigs "en", "fr"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled true
+            shrinkResources true
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        packagingOptions {
+
+            exclude 'META-INF/DEPENDENCIES.txt'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/DEPENDENCIES'
+            exclude 'META-INF/notice.txt'
+            exclude 'META-INF/license.txt'
+            exclude 'META-INF/dependencies.txt'
+            exclude 'META-INF/LGPL2.1'
+            exclude 'META-INF/ASL2.0'
+            exclude 'META-INF/maven/com.squareup/otto/pom.xml'
+            exclude 'META-INF/maven/com.squareup.okio/okio/pom.xml'
+
+            exclude 'META-INF/maven/com.squareup.moshi/moshi/pom.properties'
+            exclude 'META-INF/maven/com.squareup.moshi/moshi/pom.xml'
+
+            exclude 'META-INF/maven/com.google.protobuf/protobuf-java/pom.xml'
+            exclude 'META-INF/maven/com.google.protobuf/protobuf-java/pom.properties'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/maven/com.squareup.okio/okio/pom.xml'
+            exclude 'META-INF/maven/com.squareup.okio/okio/pom.properties'
+
+            exclude 'META-INF/maven/com.squareup.okhttp3/okhttp/pom.properties'
+            exclude 'META-INF/maven/com.squareup.okhttp3/okhttp/pom.xml'
+
+            exclude 'META-INF/maven/com.annimon/stream/pom.properties'
+            exclude 'META-INF/maven/com.annimon/stream/pom.xml'
+
+            exclude 'META-INF/maven/net.iharder/base64/pom.xml'
+            exclude 'META-INF/maven/net.iharder/base64/pom.properties'
+
+            pickFirst 'gpsoauth.properties'
+            pickFirst 'google/protobuf/any.proto'
+            pickFirst 'google/protobuf/field_mask.proto'
+            pickFirst 'google/protobuf/plugin.proto'
+            pickFirst 'google/protobuf/compiler/plugin.proto'
+            pickFirst 'google/protobuf/api.proto'
+            pickFirst 'google/protobuf/descriptor.proto'
+            pickFirst 'google/protobuf/wrappers.proto'
+            pickFirst 'google/protobuf/type.proto'
+            pickFirst 'google/protobuf/struct.proto'
+            pickFirst 'google/protobuf/timestamp.proto'
+            pickFirst 'google/protobuf/source_context.proto'
+            pickFirst 'google/protobuf/duration.proto'
+            pickFirst 'google/protobuf/empty.proto'
+        }
     }
-    packagingOptions {
 
-        exclude 'META-INF/DEPENDENCIES.txt'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/dependencies.txt'
-        exclude 'META-INF/LGPL2.1'
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/maven/com.squareup/otto/pom.xml'
-        exclude 'META-INF/maven/com.squareup.okio/okio/pom.xml'
+    dependencies {
+        compile fileTree(include: ['*.jar'], dir: 'libs')
+        testCompile 'junit:junit:4.12'
 
-        exclude 'META-INF/maven/com.squareup.moshi/moshi/pom.properties'
-        exclude 'META-INF/maven/com.squareup.moshi/moshi/pom.xml'
 
-        exclude 'META-INF/maven/com.google.protobuf/protobuf-java/pom.xml'
-        exclude 'META-INF/maven/com.google.protobuf/protobuf-java/pom.properties'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/maven/com.squareup.okio/okio/pom.xml'
-        exclude 'META-INF/maven/com.squareup.okio/okio/pom.properties'
+        compile 'com.mcxiaoke.volley:library:1.0.19'
+        compile 'com.squareup.picasso:picasso:2.3.2'
+        compile 'com.google.firebase:firebase-auth:10.2.6'
+        compile 'com.firebase:firebase-client-android:2.5.2'
+        compile 'com.facebook.android:facebook-android-sdk:4.9.0'
+        compile 'com.google.android.gms:play-services-auth:10.2.6'
+        compile 'com.google.android.gms:play-services:10.2.6'
+        compile 'com.android.support:appcompat-v7:25.0.0'
+        compile 'com.android.support:cardview-v7:25.0.0'
+        compile 'com.android.support:recyclerview-v7:25.0.0'
+        compile 'com.android.support:design:25.0.0'
+        compile 'de.hdodenhof:circleimageview:2.1.0'
+        compile 'com.squareup.okhttp3:okhttp:3.8.0'
 
-        exclude 'META-INF/maven/com.squareup.okhttp3/okhttp/pom.properties'
-        exclude 'META-INF/maven/com.squareup.okhttp3/okhttp/pom.xml'
 
-        exclude 'META-INF/maven/com.annimon/stream/pom.properties'
-        exclude 'META-INF/maven/com.annimon/stream/pom.xml'
-
-        exclude 'META-INF/maven/net.iharder/base64/pom.xml'
-        exclude 'META-INF/maven/net.iharder/base64/pom.properties'
-
-        pickFirst 'gpsoauth.properties'
-        pickFirst 'google/protobuf/any.proto'
-        pickFirst 'google/protobuf/field_mask.proto'
-        pickFirst 'google/protobuf/plugin.proto'
-        pickFirst 'google/protobuf/compiler/plugin.proto'
-        pickFirst 'google/protobuf/api.proto'
-        pickFirst 'google/protobuf/descriptor.proto'
-        pickFirst 'google/protobuf/wrappers.proto'
-        pickFirst 'google/protobuf/type.proto'
-        pickFirst 'google/protobuf/struct.proto'
-        pickFirst 'google/protobuf/timestamp.proto'
-        pickFirst 'google/protobuf/source_context.proto'
-        pickFirst 'google/protobuf/duration.proto'
-        pickFirst 'google/protobuf/empty.proto'
     }
+
+    apply plugin: 'com.google.gms.google-services'
 }
-
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-
-
-    compile 'com.mcxiaoke.volley:library:1.0.19'
-    compile 'com.squareup.picasso:picasso:2.3.2'
-    compile 'com.google.firebase:firebase-auth:10.2.6'
-    compile 'com.firebase:firebase-client-android:2.5.2'
-    compile 'com.facebook.android:facebook-android-sdk:4.9.0'
-    compile 'com.google.android.gms:play-services-auth:10.2.6'
-    compile 'com.google.android.gms:play-services:10.2.6'
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile 'com.android.support:cardview-v7:25.0.0'
-    compile 'com.android.support:recyclerview-v7:25.0.0'
-    compile 'com.android.support:design:25.0.0'
-    compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile 'com.squareup.okhttp3:okhttp:3.8.0'
-
-
-}
-
-apply plugin: 'com.google.gms.google-services'

@@ -204,7 +204,16 @@ public class MainActivity extends BaseActivity implements ItemClickListener {
             @Override
             public void onClick(View v) {
                 drawerLayout.closeDrawers();
-                startActivity(new Intent(MainActivity.this, ChooseActivity.class).putExtra("main", "main"));
+
+                Intent i=new Intent(MainActivity.this, ChooseActivity.class);
+                Bundle b=new Bundle();
+
+                i.putExtra("main", "main");
+                b.putStringArrayList("listOfSource",nList);
+                i.putExtras(b);
+               // Toast.makeText(getApplicationContext(),nList.get(0),Toast.LENGTH_SHORT).show();
+                startActivity(i);
+
 
             }
         });

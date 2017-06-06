@@ -8,6 +8,7 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -39,12 +40,16 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
     ArrayList<String> data;
     DatabaseReference myRef;
     DbHelper dbHelper;
-
+    CheckBox checkBox;
     FirebaseAuth mAuth;
+    boolean myBoolean;
+    int[] c;
+    ArrayList<String> post;
     FirebaseUser usr;
     ArrayList<String> news = new ArrayList<>();
     ArrayList<String> selectedItems = new ArrayList<String>();
     ArrayList<String> result = new ArrayList<String>();
+    ArrayList<String> selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +60,12 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
         mAuth = FirebaseAuth.getInstance();
         myRef = database.getReference();
         usr = mAuth.getCurrentUser();
-
+        checkBox = (CheckBox) findViewById(R.id.checkbox);
 
         button = (FloatingActionButton) findViewById(R.id.submit);
         listView = (ListView) findViewById(R.id.sources);
 
+        post = new ArrayList<>();
 
         dbHelper = new DbHelper(this);
         list = new ArrayList<>();
@@ -69,17 +75,25 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, data);
 
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        // Toast.makeText(getApplicationContext(),getData().get(0),Toast.LENGTH_SHORT);
+
+        Bundle b = getIntent().getExtras();
+
         if (!getIntent().hasExtra("main")) {
 
             showProgress("Please Wait", "Loading");
-            getData();
+            getData(true);
         } else {
+            getData(false);
+            selected = b.getStringArrayList("listOfSource");
+            Toast.makeText(getApplicationContext(), selected.get(0), Toast.LENGTH_SHORT);
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //showProgress("Please Wait","Loading List");
+
+
                     freshCall();
+
                 }
             });
         }
@@ -107,9 +121,33 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
         );
 
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkBox.isChecked()) {
+                    for (int i = 0; i < data.size(); i++) {
+                        listView.setItemChecked(i, true);
+                    }
+                }
+                if (!checkBox.isChecked()) {
+                    for (int i = 0; i < data.size(); i++) {
+                        listView.setItemChecked(i, false);
+                    }
+
+                }
+            }
+        });
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     public void fetchSource() {
+
         showProgress("Wait Loading", "Loading List");
         // adapter.notifyDataSetChanged();
 
@@ -147,29 +185,28 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
                             String id = currentRow.optString("id");
                             item.setId(id);
 
-
+                            news.add(item.getId());
                             if (item.getId().equals("the-next-web")) {
 
-                            } else { news.add(item.getId());
+                            } else {
                                 dbHelper.insertSources(item);
                             }
 
                         }
 
-                       runOnUiThread(new Runnable() {
-                           @Override
-                           public void run() {
-                               data = dbHelper.readAllSources();
-                               //adapter.notifyDataSetChanged();
-                               adapter = new ArrayAdapter<String>(ChooseActivity.this,
-                                       android.R.layout.simple_list_item_multiple_choice, data);
-                               listView.setAdapter(adapter);
-                               hideProgress();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                data = dbHelper.readAllSources();
+                                //adapter.notifyDataSetChanged();
+                                adapter = new ArrayAdapter<String>(ChooseActivity.this,
+                                        android.R.layout.simple_list_item_multiple_choice, data);
+                                listView.setAdapter(adapter);
 
 
-                           }
-                       });
-
+                            }
+                        });
+                        hideProgress();
 
                         Log.d("pooja", "data decoded");
 
@@ -204,17 +241,21 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
     public void checkSelected() {
 
         SparseBooleanArray checked = listView.getCheckedItemPositions();
-        selectedItems.clear();
+        // selectedItems.clear();
 
         if (checked.size() == 0) {
             Toast.makeText(getApplicationContext(), "No Change", Toast.LENGTH_SHORT).show();
         } else {
             for (int i = 0; i < checked.size(); i++) {
+
+
                 int pos = checked.keyAt(i);
+
 
                 if (checked.valueAt(i)) {
                     selectedItems.add(adapter.getItem(pos));
                 }
+
 
                 UserPrefrence usrpref = new UserPrefrence(usr.getUid(), selectedItems);
                 baseRef.child("user_pref").child(usr.getUid()).setValue(usrpref).addOnFailureListener(new OnFailureListener() {
@@ -234,20 +275,31 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
     }
 
-    public ArrayList<String> getData() {
+    public ArrayList<String> getData(final boolean next) {
 
-        ValueEventListener postListener = new ValueEventListener() {
+        final ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-                ArrayList<String> post = (ArrayList<String>) dataSnapshot.getValue();
+                post = (ArrayList<String>) dataSnapshot.getValue();
 
                 if (post != null) {
                     if (post.size() > 0) {
 
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        //hideProgress();
-                        finish();
+                        if (next) {
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            finish();
+                        } else {
+
+                            for (int i = 0; i < data.size(); i++) {
+                                for (int j = 0; j < post.size(); j++) {
+                                    if (data.get(i).equals(post.get(j))) {
+                                        listView.setItemChecked(i, true);
+                                    }
+                                }
+                            }
+
+                        }
                         hideProgress();
                     } else {
                         hideProgress();
@@ -282,14 +334,17 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    showProgress("Please Wait","Loading List");
                     fetchSource();
                 }
             });
 
             //adapter.notifyDataSetChanged();
+        } else {
+
         }
     }
+
+
 }
 
 

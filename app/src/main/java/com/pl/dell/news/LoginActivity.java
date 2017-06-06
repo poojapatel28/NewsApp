@@ -55,7 +55,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
 
 
-    DemoProgress p;
+//    DemoProgress p;
     Activity a;
     String u_name;
     User u;
@@ -75,10 +75,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             super.onCreate(savedInstanceState);
             FacebookSdk.sdkInitialize(getApplicationContext());
             setContentView(R.layout.activity_login);
-            p=new DemoProgress(LoginActivity.this);
 
 
-            // Views
+
+
             mStatusTextView = (TextView) findViewById(R.id.status);
             name=(TextView)findViewById(R.id.name);
 
@@ -145,7 +145,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         private void handleFacebookAccessToken(final AccessToken token) {
             Log.d(TAG, "handleFacebookAccessToken:" + token);
             // [START_EXCLUDE silent]
-            p.showProgress("Please Wait","Loading");
+            showProgress("Please Wait","Loading");
             // [END_EXCLUDE]
 
             AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
@@ -225,7 +225,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                         Toast.LENGTH_SHORT).show();
                                 updateUI(null);
                             }
-                            p.hideProgress();
+                            hideProgress();
 
 
                             // [END_EXCLUDE]
@@ -262,7 +262,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                runOnUiThread(new Runnable() {
                    @Override
                    public void run() {
-                       p.hideProgress();
+                       hideProgress();
                        startActivity(new Intent(getApplicationContext(),ChooseActivity.class));
                        finish();
                    }
