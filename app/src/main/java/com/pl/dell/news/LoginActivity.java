@@ -77,6 +77,23 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             setContentView(R.layout.activity_login);
 
 
+            try {
+                PackageInfo info = getPackageManager().getPackageInfo(
+                        "com.pl.dell.news",
+                        PackageManager.GET_SIGNATURES);
+                for (Signature signature : info.signatures) {
+                    MessageDigest md = MessageDigest.getInstance("SHA");
+                    md.update(signature.toByteArray());
+                   // Toast.makeText(getApplicationContext(),"KeyHash:"+ Base64.encodeToString(md.digest(), Base64.DEFAULT),Toast.LENGTH_LONG).show();
+                    Log.e("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                    Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+
+            } catch (NoSuchAlgorithmException e) {
+
+            }
+
 
 
             mStatusTextView = (TextView) findViewById(R.id.status);

@@ -1,9 +1,11 @@
 package com.pl.dell.news;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -84,8 +86,7 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
             getData(true);
         } else {
             getData(false);
-            selected = b.getStringArrayList("listOfSource");
-            Toast.makeText(getApplicationContext(), selected.get(0), Toast.LENGTH_SHORT);
+
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -108,12 +109,27 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
                                       public void onClick(View v) {
                                           selectedItems.clear();
                                           checkSelected();
+                                          if(listView.getCheckedItemCount()==0)
+                                          {
+                                              AlertDialog.Builder builder = new AlertDialog.Builder(ChooseActivity.this);
+                                              builder.setMessage("Select Atleast One")
+                                                      .setCancelable(false)
+                                                      .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                          public void onClick(DialogInterface dialog, int id) {
+                                                              //do things
+                                                          }
+                                                      });
+                                              AlertDialog alert = builder.create();
+                                              alert.show();
+                                          }
+                                          else {
 
 
-                                          Intent intent = new Intent(getApplicationContext(),
-                                                  MainActivity.class);
+                                              Intent intent = new Intent(getApplicationContext(),
+                                                      MainActivity.class);
 
-                                          startActivity(intent);
+                                              startActivity(intent);
+                                          }
 
 
                                       }
@@ -148,7 +164,7 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
     public void fetchSource() {
 
-        showProgress("Wait Loading", "Loading List");
+       // showProgress("Wait Loading", "Loading List");
         // adapter.notifyDataSetChanged();
 
         Log.d("MainActivity", "fetch method");
@@ -213,6 +229,7 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
                     }
                 } catch (Exception e) {
+                    hideProgress();
                     e.printStackTrace();
                 }
             }
@@ -241,7 +258,6 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
     public void checkSelected() {
 
         SparseBooleanArray checked = listView.getCheckedItemPositions();
-        // selectedItems.clear();
 
         if (checked.size() == 0) {
             Toast.makeText(getApplicationContext(), "No Change", Toast.LENGTH_SHORT).show();
@@ -287,6 +303,13 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
                     if (post.size() > 0) {
 
                         if (next) {
+                            for (int i = 0; i < data.size(); i++) {
+                                for (int j = 0; j < post.size(); j++) {
+                                    if (data.get(i).equals(post.get(j))) {
+                                        listView.setItemChecked(i, true);
+                                    }
+                                }
+                            }
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
                             finish();
                         } else {
@@ -331,10 +354,14 @@ public class ChooseActivity extends BaseActivity implements View.OnClickListener
 
     void freshCall() {
         if (dbHelper.readAllSources().size() == 0) {
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
                     fetchSource();
+
+
                 }
             });
 
