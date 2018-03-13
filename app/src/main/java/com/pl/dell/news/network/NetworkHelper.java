@@ -2,10 +2,7 @@ package com.pl.dell.news.network;
 
 import android.app.Activity;
 import android.widget.Toast;
-
-
 import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
